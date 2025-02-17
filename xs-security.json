@@ -27,5 +27,21 @@
       ],
       "attribute-references": []
     }
+  ],
+  "role-collections": [
+    {
+      "name": "IncidentManagement Support",
+      "description": "generated",
+      "role-template-references": [
+        "$XSAPPNAME.support"
+      ]
+    },
+    {
+      "name": "Incident Management Admin",
+      "description": "generated",
+      "role-template-references": [
+        "$XSAPPNAME.admin"
+      ]
+    }
   ]
 }
