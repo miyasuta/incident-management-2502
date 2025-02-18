@@ -19,16 +19,29 @@ modules:
     parameters:
       instances: 1
       buildpack: nodejs_buildpack
+      routes:
+        - route: "${default-url}"
+        - route: "${default-host}.cert.${default-domain}"
     build-parameters:
       builder: npm-ci
     provides:
       - name: srv-api # required by consumers of CAP services (e.g. approuter)
         properties:
           srv-url: ${default-url}
+          srv-cert-url: '${protocol}://${default-host}.cert.${default-domain}'
     requires:
       - name: incident-management-2502-db
-      - name: incident-management-2502-auth
+      # - name: incident-management-2502-auth
       - name: incident-management-2502-destination
+      - name: incident-management-2502-auth
+        parameters:
+          config:
+            credential-type: X509_GENERATED
+            app-identifier: srv
+    deployed-after:
+      - incident-management-2502-ams-policies-deployer
+    properties:
+      AMS_DCL_ROOT: ams/dcl
 
   - name: incident-management-2502-db-deployer
     type: hdb
@@ -97,6 +110,39 @@ modules:
               ServiceKeyName: incident-management-2502-auth-key
               sap.cloud.service: incidentmanagement2502.service
 
+  - name: incident-management-2502-ams-policies-deployer
+    type: javascript.nodejs
+    path: gen/policies
+    parameters:
+      buildpack: nodejs_buildpack
+      no-route: true
+      no-start: true
+      tasks:
+        - name: deploy-dcl
+          command: npm start
+          memory: 512M
+    requires:
+      - name: incident-management-2502-auth
+        parameters:
+          config:
+            credential-type: X509_GENERATED
+            app-identifier: ams-policy-deployer
+
+  # - name: incident-management-2502-app-deployer
+  #   type: com.sap.application.content
+  #   path: gen
+  #   requires:
+  #     - name: incident-management-2502-html5-repo-host
+  #       parameters:
+  #         content-target: true
+  #   build-parameters:
+  #     build-result: app/
+  #     requires:
+  #       - name: incidentmanagement2502incidents2502
+  #         artifacts:
+  #           - incidents2502.zip
+  #         target-path: app/
+
 resources:
   - name: incident-management-2502-db
     type: com.sap.xs.hdi-container
@@ -108,15 +154,15 @@ resources:
     parameters:
       service: html5-apps-repo
       service-plan: app-host
-  - name: incident-management-2502-auth
-    type: org.cloudfoundry.managed-service
-    parameters:
-      service: xsuaa
-      service-plan: application
-      path: ./xs-security.json
-      config:
-        xsappname: incident-management-2502-${org}-${space}
-        tenant-mode: dedicated
+  # - name: incident-management-2502-auth
+  #   type: org.cloudfoundry.managed-service
+  #   parameters:
+  #     service: xsuaa
+  #     service-plan: application
+  #     path: ./xs-security.json
+  #     config:
+  #       xsappname: incident-management-2502-${org}-${space}
+  #       tenant-mode: dedicated
   - name: incident-management-2502-destination
     type: org.cloudfoundry.managed-service
     parameters:
@@ -147,3 +193,14 @@ resources:
           name: srv-api # must be used in xs-app.json as well
           url: ~{srv-url}
           forwardAuthToken: true
+  - name: incident-management-2502-auth
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: identity
+      service-name: incident-management-2502-auth
+      service-plan: application
+      config:
+        display-name: incident-management-2502
+        authorization:
+          enabled: true
+        xsuaa-cross-consumption: true
