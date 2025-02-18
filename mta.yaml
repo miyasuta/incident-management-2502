@@ -81,10 +81,10 @@ modules:
   - name: incident-management-2502-destinations
     type: com.sap.application.content
     requires:
-      - name: incident-management-2502-auth
-        parameters:
-          service-key:
-            name: incident-management-2502-auth-key
+      # - name: incident-management-2502-auth
+      #   parameters:
+      #     service-key:
+      #       name: incident-management-2502-auth-key
       - name: incident-management-2502-html5-repo-host
         parameters:
           service-key:
@@ -104,11 +104,11 @@ modules:
               ServiceInstanceName: incident-management-2502-html5-repo-host
               ServiceKeyName: incident-management-2502-html5-repo-host-key
               sap.cloud.service: incidentmanagement2502.service
-            - Name: incident-management-2502-auth
-              Authentication: OAuth2UserTokenExchange
-              ServiceInstanceName: incident-management-2502-auth
-              ServiceKeyName: incident-management-2502-auth-key
-              sap.cloud.service: incidentmanagement2502.service
+            # - Name: incident-management-2502-auth
+            #   Authentication: OAuth2UserTokenExchange
+            #   ServiceInstanceName: incident-management-2502-auth
+            #   ServiceKeyName: incident-management-2502-auth-key
+            #   sap.cloud.service: incidentmanagement2502.service
 
   - name: incident-management-2502-ams-policies-deployer
     type: javascript.nodejs
@@ -181,6 +181,7 @@ resources:
                 ProxyType: Internet
                 HTML5.ForwardAuthToken: true
                 HTML5.DynamicDestination: true
+                HTML5.IASDependencyName: incidents-api
               - Name: ui5
                 URL: https://ui5.sap.com
                 Authentication: NoAuthentication
@@ -204,3 +205,6 @@ resources:
         authorization:
           enabled: true
         xsuaa-cross-consumption: true
+        provided-apis:
+          - name: incidents-api
+            description: api exposed by incident mgmt app

@@ -57,14 +57,13 @@
       },
       "[production]": {
         "db": "hana",
-        "auth": "xsuaa"
+        "auth": {
+          "kind": "ias"
+        }
       },
       "html5-repo": true,
       "destinations": true,
-      "workzone": true,
-      "auth": {
-        "kind": "ias"
-      }
+      "workzone": true
     },
     "sql": {
       "native_hana_associations": false

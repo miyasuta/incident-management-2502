@@ -6,14 +6,14 @@
       "source": "^/?odata/(.*)$",
       "target": "/odata/$1",
       "destination": "incident-management-2502-srv-api",
-      "authenticationType": "xsuaa",
+      "authenticationType": "ias",
       "csrfProtection": true
     },
     {
       "source": "^(.*)$",
       "target": "$1",
       "service": "html5-apps-repo-rt",
-      "authenticationType": "xsuaa"
+      "authenticationType": "ias"
     }
   ]
 }
